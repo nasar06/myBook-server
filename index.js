@@ -39,7 +39,10 @@ function run(){
         //user post get 
         app.get('/userPost', async(req, res)=>{
             const query = {}
-            const result = await allPostCollection.find(query).toArray()
+            const options = {
+                sort: { "time": -1 },
+              };
+            const result = await allPostCollection.find(query, options).toArray()
             res.send(result)
         })
 
