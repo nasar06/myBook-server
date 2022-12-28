@@ -3,12 +3,20 @@ const { MongoClient, ServerApiVersion } = require('mongodb');
 const app = express()
 const port = process.env.PORT || 5000
 
+const cors = require('cors')
+require('dotenv').config();
+
+
+app.use(cors())
+app.use(express.json())
+
 
 
 //test
 app.get('/', (req, res)=>{
     res.send('server is on')
 })
+
 
 
 //connect to mongodb database
@@ -20,12 +28,19 @@ function run(){
     try{
 
         //database collections
-        const allPostCollection = client.db('myBook').collection('all-post')
+        const allPostCollection = client.db('myBook').collection('allPost')
 
-
-        app.post('/post', (req, res)=>{
-            const data = req.body
-            console.log(data)
+        //User post 
+        app.post('/userPost', async(req, res)=>{
+            const post = req.body
+            const result = await allPostCollection.insertOne(post)
+            res.send(result)
+        })
+        //user post get 
+        app.get('/userPost', async(req, res)=>{
+            const query = {}
+            const result = await allPostCollection.find(query).toArray()
+            res.send(result)
         })
 
     }
