@@ -1,5 +1,5 @@
 const express = require('express')
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app = express()
 const port = process.env.PORT || 5000
 
@@ -40,6 +40,14 @@ function run(){
         app.get('/userPost', async(req, res)=>{
             const query = {}
             const result = await allPostCollection.find(query).toArray()
+            res.send(result)
+        })
+
+        //user post detail 
+        app.get('/details/:id', async(req, res)=>{
+            const id = req.params.id
+            const query = {_id: ObjectId(id)}
+            const result = await allPostCollection.findOne(query)
             res.send(result)
         })
 
