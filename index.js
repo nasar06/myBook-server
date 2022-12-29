@@ -29,6 +29,8 @@ function run() {
 
         //database collections
         const allPostCollection = client.db('myBook').collection('allPost')
+        const PostReviewCollection = client.db('myBook').collection('PostReview')
+        const usersCollection = client.db('myBook').collection('users')
 
         //User post [home page]
         app.post('/userPost', async (req, res) => {
@@ -70,7 +72,7 @@ function run() {
             const filter = { _id: ObjectId(id) }
             const options = { upsert: true }
             const field = await allPostCollection.findOne(filter);
-            console.log(field)
+            
 
             if (field?.love) {
                 const updatedDoc = {
@@ -96,6 +98,51 @@ function run() {
 
 
         })
+
+        // comment Post [card]
+        app.post('/comment', async(req, res)=>{
+            const comment = req.body
+            const result = await PostReviewCollection.insertOne(comment)
+            res.send(result)
+        })
+
+
+        // comment Post [card]
+        app.get('/comment', async(req, res)=>{
+            const query = {}
+            const options = {
+                sort: {'time': -1}
+            }
+            const result = await PostReviewCollection.find(query, options).toArray()
+            res.send(result)
+        })
+
+
+         //post users [signUp]
+         app.post('/users', async (req, res) => {
+            const email = req.query.email;
+            const query = {email}
+            const existingUser = await usersCollection.findOne(query)
+            if(existingUser?.email === email){
+                return res.status(401).send({massage: 'Already exist This user'})
+            }
+            const user = req.body;
+            const result = await usersCollection.insertOne(user)
+            res.send(result)
+        })
+
+
+        //get users
+        app.get('/users', async(req, res)=>{
+            const email = req.query.email;
+            const query = {userEmail: email}
+            console.log(query,'---------', email)
+            const result = await usersCollection.findOne(query)
+            res.send(result)
+            console.log('result',result)
+        })
+
+
 
     }
     catch { }
